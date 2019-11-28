@@ -1,0 +1,106 @@
+\documentclass[paper=a4,toc=bibliography,chapterprefix,parskip=true]{scrreprt}
+
+% -------------------------------------------------------------------
+%%% Laden elementarer Pakete
+%
+% Deutsche Schriftpakete
+\usepackage[utf8]{inputenc}              % alternativ: 'ansinew' oder 'latin9' statt utf8
+\usepackage[TS1,T1]{fontenc}
+\usepackage{mathptmx}
+%\usepackage{lmodern,textcomp}
+\usepackage[english,ngerman]{babel}
+\usepackage{microtype}
+%
+% Mathematische Paktete
+\usepackage{amsmath,amssymb,bm,bbm}         % Formelsetzung und mathematischen Symbole
+\usepackage[amsmath,thmmarks]{ntheorem}     % Theorem-Umgebungen, alternativ: 'amsthm'
+%
+% Grafik-Pakete einbinden
+\usepackage{graphicx,psfrag}                % Basis-Pakete zum Laden von Bildern (jpg?)
+\usepackage{float}
+\usepackage{color}                          % erweitertes Farb-Paket, alternativ: 'xcolor'
+%\usepackage{pstricks,pst-plot}              % weiteres Paket zur Erstellung von LaTeX-Grafiken
+%
+% erweiterte Tabellen
+\usepackage{array}                          % Basis-Paket
+\usepackage{booktabs}                       % 'schöne' Tabellen
+\usepackage{tabularx}                       % Tabellen mit dynamischer Spaltenbreite
+\usepackage{longtable}                      % Tabellen mit möglichem Seitenumbruch
+\usepackage{multirow}                       % mehrzeilige Zellen
+%
+% weitere
+\usepackage{verbatim, listings}             % Darstellung von Quellcode
+\lstset{language=TeX,basicstyle=\footnotesize,frame=single,breaklines=true}
+\usepackage[format=plain,indention=.5cm]{caption} % für selbsdefinierte captions
+\usepackage{stmaryrd}                       % Blitzsymbol bei Widerspruch
+
+\usepackage[natbib=true,style=numeric-comp,sorting=none,minnames=1,maxnames=3,doi=true,url=true, giveninits=true,eprint=false]{biblatex}  
+\bibliography{literatur/literatur.bib}% naturwissenschaftliche Zitierweise
+\usepackage[autostyle]{csquotes}
+
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+%
+% Paket für interne Links
+\usepackage[
+	breaklinks=true    % Links »überstehen« Zeilenumbruch
+  	,colorlinks        % Links erhalten Farben statt Kästen
+  	,linkcolor=black   % beeinflusst Inhaltsverzeichnis und Seitenzahlen
+ 	,urlcolor=black    % Farbe für URLs
+    ,citecolor=black
+  	,bookmarks         % Erzeugung von Bookmarks für PDF-Viewer
+  	,bookmarksnumbered % Nummerierung der Bookmarks
+]{hyperref}
+\usepackage[hyphenbreaks]{breakurl}
+
+%\usepackage{hyperref}
+%\usepackage[german=true]{hypdvips}
+%\hypersetup{breaklinks=true}
+
+%
+% -------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------
+%%% Seitenstil
+%
+\usepackage{scrlayer-scrpage}                       % Kopf- und Fußzeilenformatierung
+\usepackage[onehalfspacing]{setspace}       % Zeilenabstand = 1,5
+\recalctypearea
+\pagestyle{scrheadings}
+\automark[section]{chapter}
+\addtokomafont{sectioning}{\rmfamily}
+%
+% -------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------
+%%% Einstellungen und Formatierung der Theorem-Umgebung
+%
+% Stil der Definition - Umgebung
+\theoremstyle{break}
+\theoremheaderfont{\sffamily\bfseries}
+\theorembodyfont{\upshape}
+\theoremsymbol{}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{satz}[definition]{Satz}
+\newtheorem{resultat}[definition]{Resultat}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{folgerung}[definition]{Folgerung}
+\newtheorem{korollar}[definition]{Korollar}
+%
+\theorembodyfont{\rmfamily}
+\newtheorem{bemerkung}[definition]{Bemerkung}
+\newtheorem{beispiel}[definition]{Beispiel}
+%
+% Stil der Beweis - Umgebung
+\theoremstyle{nonumberplain}
+\theoremsymbol{\ensuremath{\Box}}
+\newtheorem{beweis}{Beweis}
+%
+% ------------------------------------------------------------------- 
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000

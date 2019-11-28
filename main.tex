@@ -1,0 +1,61 @@
+\include{header}
+
+\begin{document}
+
+% -------------------------------------------------------------------
+% Titelseite, Inhaltsverzeichnis, Abbildungsverzeichnis, usw.
+
+\include{kapitel/titelseite} % <- Hier sollten Name/Titel/usw. eingetragen werden!
+\pagenumbering{roman}
+\tableofcontents
+%\listoffigures
+%\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+%\listofalgorithms
+% ...
+\clearpage
+\pagenumbering{arabic}
+% -------------------------------------------------------------------
+
+% -------------------------------------------------------------------
+% Hauptteil
+\include{kapitel/einleitung}
+%\include{kapitel/forschungsstand}
+\include{kapitel/gestenerkennung}
+\include{kapitel/evaluation}
+\include{kapitel/schlussteil}
+
+% ... hier können weitere kapitel eingefügt werden!
+% -------------------------------------------------------------------
+
+% -------------------------------------------------------------------
+% Anhang
+%\appendix
+%\include{kapitel/anhang}
+% -------------------------------------------------------------------
+
+% -------------------------------------------------------------------
+% Literaturverzeichnis
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+%\bibliographystyle{alphadin}
+\printbibliography
+%\include{literatur/literatur}
+\clearpage
+% -------------------------------------------------------------------
+
+% -------------------------------------------------------------------
+% Selbstständigkeitserklaerung EINBINDEN!! (nicht nötig für Seminararbeiten) 
+% Eine Vorlage für die Erklärung finden Sie auf der Seite des Prüfungsamts.
+\thispagestyle{myheadings} \markboth{}{SELBSTSTÄNDIGKEITSERKLÄRUNG} \addcontentsline{toc}{chapter}{Selbstständigkeitserklärung}
+\thispagestyle{empty}
+\subsection*{Selbstständigkeitserklärung}
+Hiermit erkläre ich, dass ich die vorliegende Proseminararbeit selbstständig und nur unter Verwendung der angegebenen Quellen und Hilfsmittel angefertigt habe und alle Stellen, die wörtlich oder sinngemäß aus den benutzten Quellen entnommen sind, als solche kenntlich gemacht habe. 
+
+\vspace{1cm}
+
+\noindent Dortmund, \today \hfill \parbox[t]{8cm}{\dotfill\\
+    \vspace{-0.7cm}\center Janis Büse}
+
+\cleardoublepage 
+% -------------------------------------------------------------------
+
+\end{document}

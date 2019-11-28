@@ -1,0 +1,110 @@
+\chapter{Methoden zur Gestenerkennung}
+
+\section{Forschungsstand}
+//TODO ANBC-Algorithmus = Adaptive Naïve Bayes Classifier-Algorithmus Abkürzung erklären
+
+\section{Skelettverfolgung mit Microsoft Kinect}\label{Tracking}
+Kinect ist ein von PrimeSense und Microsoft entwickeltes Eingabegerät, dass Gesten des menschlichen Körpers erkennen kann. Das System besteht unter Anderem aus einer RGB-Kamera und einem Infrarot-Emitter mit zugehöriger Infrarot-Kamera~(s.~Abbildung~\ref{fig:kinectSensor}). Diese Ausstattung setzt eine RGB-D Tiefenkamera um, in der Farb- und Tiefeninformationen gesammelt und von der PrimeSense-CPU zu räumlichen Informationen zusammengesetzt werden. Als Ergebnis wird unter Anderem ein Tiefen- und ein Farbdatenstrom über USB an den Host geliefert~(s.~Abb.~\ref{fig:kinectAufbau}) \cite{hannaKinect1}. Mit den Tiefendaten kann ein Skelett der Person vor dem Sensor abgerufen werden und eine fortlaufende Skelettverfolgung realisiert werden. Aus den Daten der Skelettverfolgung können dann die Gesten extrahiert werden. Das Kinect-System ist in der Industrie und Forschung auch wegen seines geringen Preises sehr beliebt und wird neben dem von Asus entwickelten Xtion Pro häufig eingesetzt. Im Folgenden soll die Funktionsweise und die Speicherung der Skelettdaten genauer erläutert werden.~\cite{cruzkinect}
+
+Der Kinect erzeugt mit dem Infrarot-Emitter eine speziell deformierte Punktwolke, die dann mit der Infrarotkamera aufgenommen wird. Die Logik in der PrimeSense-CPU berechnet dann aus den gesammelten Daten eine Tiefenmatrix, aus der auf die Entfernung der Objekte vor dem Sensor geschlossen werden kann. \cite{hannaKinect1} Die Reichweite von Kinect beschränkt sich dabei auf eine Entfernung von ungefähr 0,5 bis 4 Meter. Für die Gestenstenerkennung unabdingbar ist eine Bewegungsverfolgung der Benutzer - auch Skelettverfolgung genannt. Für diese muss ermittelt werden, wo sich die Körperteile des Benutzers befinden. Diese Funktion wird von der Hardware nicht bereitgestellt. Die Tiefenkarte als Ausgabe des Sensors muss also von einem Skelettverfolgungs-Algorithmus verarbeitet werden. Hierfür bietet sich zum Beispiel das Kinect SDK von Microsoft\footnote{\url{https://developer.microsoft.com/de-de/windows/kinect}} oder die OpenNI-API\footnote{\url{https://structure.io/openni}} an. Beide Lösungen können den Ausführenden erkennen und die räumlichen Koordinaten von einer Reihe von Körperteilen liefern. Für den OpenNI-Tracker sind das im Oberkörper \textit{\{Torso, Nacken, Kopf, Linke Schulter, Linker Ellenbogen, Linkes Handgelenk, Rechte Schulter, Rechter Ellenbogen, Rechtes Handgelenk\}}. Die Position der Körperteile wird dabei als Verschiebungsvektor $T \; = \; (x_{K\Ddot{o}rperteil}^{Torso}, y_{K\Ddot{o}rperteil}^{Torso}, z_{K\Ddot{o}rperteil}^{Torso})$ eines Gelenks in Relation zum Torso dargestellt. \cite{flexibleSystem, skeletonTracking}
+
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth} 
+  \centering
+  \includegraphics[width=.95\linewidth]{bilder/kinectSensor.png}
+  \caption{Quelle: vgl. \cite{kinectSensorBild}}
+  \label{fig:kinectSensor}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth} 
+  \centering
+  \includegraphics[width=.95\linewidth]{bilder/KinectAufbau.png}
+  \caption{Quelle: vgl. \cite{kinectAufbauBild}}
+  \label{fig:kinectAufbau}
+\end{subfigure}
+\caption{Das Kinect System: \\ (a) Kinect-Sensor aus dem Jahr 2010 mit Infrarotemitter~\textit{(1)}, CMOS-Farbkamera~\textit{(2)} und CMOS-Infrarotkamera~\textit{(3)}. \\ (b) Aufbau des Kinect-Systems als Flussdiagram. Einige Komponenten sind nicht abgebildet.}
+\label{fig:kinextSystem}
+\end{figure}
+
+//TODO Beschreiben, wie Sensordaten aussehen. Also Speicherung als (Gesten-)Vektor.~\cite{flexibleSystem}
+
+\section{Gestenerkennung mit dem ANBC-Algorithmus}
+Der nächste Schritt ist jetzt anhand gegebener Beobachtungsdaten, die in \ref{Tracking} als ein Gestenvektor $V$ definiert wurden, Gesten zu erkennen. $V$ ist dabei von der Form:
+\begin{equation} \label{Gestenvektor}
+    V=(x_{K\Ddot{o}rperteilA}^{Torso}, y_{K\Ddot{o}rperteilA}^{Torso}, z_{K\Ddot{o}rperteilA}^{Torso}, ..., x_{K\Ddot{o}rperteilZ}^{Torso}, y_{K\Ddot{o}rperteilZ}^{Torso}, z_{K\Ddot{o}rperteilZ}^{Torso})
+\end{equation}
+Die zur Verfügung stehenden beobachteten Eigenschaften in dem Gestenvektor sind die jeweiligen Verschiebungsvektoren bestehend aus den x-,y und z-Werten der getrackten Körperteile in Relation zum Torso. Auf Basis dieser Eigenschaften soll nun entschieden werden, welche Geste durch einen gegebenen Gestenvektor dargestellt wird. Diese Aufgabe ist ein wesentlicher Bereich der Mustererkennung - die Klassifizierung. Die Gesten die erkannt werden sollen sind dabei die Klassen und die Beobachtungsdaten sollen diesen zugeordnet werden. Eine perfekte Klassifizierung ist durch die Variabilität in der Ausführung einer Geste und den damit verbundenen leichten Unterschieden in den Gestenvektoren praktisch unmöglich. Es kann also nur entschieden werden, zu welcher Klasse ein gegebener Gestenvektor am wahrscheinlichsten gehört. Dafür muss eine statistische Mustererkennung genutzt werden, die davon ausgegeht, dass ein Gestenvektor auf jeden Fall einer der definierten Klassen zugeordnet werden kann. Für die Berechnung der Wahrscheinlichkeiten für die Zugehörigkeit zu einer Klasse gibt es einige Klassifikationsverfahren. Besonders hervorgehoben seien dabei neuronale Netze, die Nächste-Nachbarn-Klassifikation beziehungsweise der daraus resultierende k-nächste-Nachbarn-Algorithmus \cite{nearestNeighbor} und der (naive) Bayes-Klassifikator.~\cite{patternClassification1, patternRecognitionTheory}
+
+Ein mögliches Verfahren ist der von Nicholas Gillian in \cite{gillianANBC} beschriebene ANBC-Algorithmus. Dabei handelt es sich um einen überwachten Lernalgorithmus, mit dem die oben beschriebene Klassifizierung von Gesten möglich ist. Dafür wird der naive Bayes-Klassifikator genutzt, der ein auf dem Satz von Bayes basierendes Verfahren zur probabilistischen Zuordnung ist. Der ANBC-Algorithmus soll im Folgenden erklärt werden.
+
+Der Satz von Bayes beschreibt die Wahrscheinlichkeit für das Auftreten eines Ereignisses unter der Bedingung, dass ein anderes Ereignis eingetreten ist:
+\begin{equation}
+    P(A\mid B) \; = \; \frac {P(B\mid A) \cdot P(A)} {P(B)}
+\end{equation}
+$P(A)$ und $P(B)$ sind die jeweiligen A-priori-Wahrscheinlichkeiten der Ereignisse A und B. Mit $P(A\mid B)$ wird die Wahrscheinlichkeit des Eintretens von A unter der Bedingung, dass B schon eingetreten ist - genannt A-posteriori-Wahrscheinlichkeit - beschrieben. $P(B)$ ist in diesem Fall ein normalisierender Faktor, der sicherstellt, dass die Summe aller A-posteriori-Wahrscheinlichkeiten 1 entspricht.
+
+Mit dem naiven Bayes-Klassifikator ist es möglich die Wahrscheinlichkeit für die Zugehörigkeit einer Geste zu einer vorher definierten Klasse $G_k$ aus einer Menge von Klassen $G$ zu bestimmen. Die Menge von Klassen entspricht dabei genau den Gesten, die erkannt werden sollen. Dafür muss der Satz von Bayes so umgeschrieben werden, dass er die Wahrscheinlichkeit für die Zugehörigkeit zu einer Klasse $G_k$ unter der Bedingung, dass die Sensordaten $S$ eingetreten sind, berechnet. Da die einzelnen Klassen paarweise disjunkt sind, erhält man mit dem Satz von der totalen Wahrscheinlichkeit~\cite{tuckwellWahrscheinlichkeit}:
+\begin{equation} \label{BasisBayes}
+    P(G_k\mid S) \; = \; \frac{P(S\mid G_k)\cdot P(G_k)}{\sum_{i=1} ^{G} P(S\mid G_i) \cdot P(G_i)}
+\end{equation}
+Der normalisierende Faktor ist nun die Summe der Wahrscheinlichkeiten aller in $G$ definierten Gesten unter der Bedingung, dass die Sensordaten $S$ eingetreten sind.
+
+Ein nun entstehendes Problem ist, dass in einem Trainingsdatensatz das genaue Tupel $(V\mid G_i)$ mit hoher Wahrscheinlichkeit nicht enthalten ist. Hier hilft die naive Annahme, auf dem der Klassifikator basiert. Es wird eine gegenseitige Unabhängigkeit der Attribute, also der einzelnen Werte aus dem Gestenvektor $V$ angenommen. Also kann \eqref{BasisBayes} mit dem Gestenvektor V als Daten des Sensors umgeschrieben werden~\cite{gillianANBC}:
+\begin{equation}
+    P(G_k\mid V) \; = \; \frac{P(V\mid G_k)\cdot P(G_k)}{\sum_{i=1} ^{G} P(V\mid G_i) \cdot P(G_i)}
+\end{equation} \\
+Die naive Annahme ermöglicht weiterhin, dass $P(V\mid G_k)$ sich als Produkt der Werte aus $V$ schreiben lässt \cite{BouNaiveBayes, patternClassification2}:
+\begin{equation} \label{naiveBayes1}
+    P(V\mid G_k) \; = \; \prod_{n=1} ^{N} P(V_n\mid G_k)
+\end{equation} \\
+Unter der Annahme, dass in dem Gestenvektor $5$ Körperteile getrackt werden, ist die Anzahl der Elemente in dem Vektor $N=15$. Nun kann jede Wahrscheinlichkeit $P(V_n\mid G_k)$ einzeln evaluiert werden.~\cite{gillianANBC, BouNaiveBayes}.
+
+Das Ergebnis des Klassifikator wird also von den bedingten Dichteverteilungen $P(V\mid G_k)$ und den vorausgehenden Wahrscheinlichkeiten $P(G_k)$ bestimmt. Für n-dimensionale Vektoren mit kontinuierlichen Werten hat sich die multivariate Normalverteilung als geeignet erwiesen \cite{flexibleSystem}. Diese ist für $N$ Dimensionen wie folgt definiert:
+\begin{equation}
+    {\mathcal {N}}(\mathbf{x} \mid \mathbf{\mu}, \Sigma) \; = \; \frac{1}{(2\pi)^{N/2} \sqrt{\lvert\Sigma\rvert}} \exp{ \left( -\frac{1}{2}(\mathbf{x} - \mathbf{\mu})^T \Sigma^{-1} (\mathbf{x} - \mathbf{\mu}) \right)}
+\end{equation}
+Dabei ist $\mathbf{\mu}$ der $N$-dimensionale Erwartungswertvektor und $\Sigma$ eine $N\times N$ Kovarianzmatrix, die die Rolle der skalaren Varianz aus der univariaten Normalverteilung einnimmt. Angewandt auf einen Gestenvektor $V$ und eine Klasse $G_k$~\cite{gillianANBC}:
+\begin{equation} \label{multivariate} 
+    {P(V\mid G_k)} \sim {\mathcal {N}}({V_k \mid \mu_k, \Sigma_k} )
+\end{equation}
+Die multivariate Normalverteilung kann aus dem Produkt von $N$ unabhängigen univariaten Normalverteilungen berechnet werden:
+\begin{equation} \label{univariate}
+    \mathcal {N}(V\mid \mu_k ,\sigma^{2}_k) \; = \; \prod_{n=1}^N {\frac {1}{\sigma_{n} \sqrt {2\pi}}}\operatorname {exp} \left(-{\frac {(V_n-\mu_{n} )^{2}}{2\sigma^{2}_{n}}}\right)
+\end{equation}
+Dabei ist $\mu_{n}$ der Mittelwert und $\sigma_{n}$ die Varianz für die jeweilige Klasse $k$ in $G$ und die Dimension $n$ in einem Gestenvektor $V$. Um nun also einen gegebenen Gestenvektor $V$ einer Klasse in $G$ zuzuordnen, müssen alle Wahrscheinlichkeiten $P(G_k\mid V)$ für $1\leq k\leq |G|$ berechnet werden. Die Klassifizierung ist möglich mit einer Maximum-a-posteriori-Schätzung, bei der die höchste A-posteriori-Wahrscheinlichkeit gewählt wird. Setzt man die Gleichung aus \eqref{naiveBayes1} ein, erhält man~\cite{gillianANBC}: 
+\begin{equation}
+    {\underset {k}{\operatorname {arg\,max} }\quad
+        P(G_k\mid S) \; = \; \frac{P(S\mid G_k)\cdot P(G_k)}{\sum_{i=1} ^{G} P(S\mid G_i) \cdot P(G_i)}}\qquad
+    f\ddot{u}r\quad 1\leq k\leq |G|
+\end{equation}
+Da der Nenner für alle Klassen gleich ist, kann er ohne Auswirkung auf die Ergebnisse ignoriert werden. Die Wahrscheinlichkeit $P(G_k)$ für das Auftreten eines Gestenvektors $G_k$ im Datensatz ist in der praktischen Anwendung gleich zu dem konstanten Skalar $1/N$ und kann somit ebenfalls ignoriert werden. Unter Anwendung von \eqref{multivariate} beziehungsweise \eqref{univariate} erhält man also für die zu $V$ zugeordnete Klasse $G_v$ \cite{gillianANBC}:
+\begin{equation} \label{finalClassification}
+    \qquad \ G_v \; = \; {\underset {k}{\operatorname {arg\,max} }\quad
+    \mathcal {N}(V\mid \mu_k ,\sigma^{2}_k)}\qquad \qquad \ \ \ \ \
+    f\ddot{u}r\quad 1\leq k\leq |G|
+\end{equation}
+Die Abschätzung der Mittelwerte $\mu_k$ und Varianzen $\sigma_k^2$ findet anhand der Trainingsdaten statt (s. \ref{Training}). Für jeden vorliegenden Vektor ist jetzt also eine Klassifizierung möglich. 
+
+\section{Training des Gaußmodells} \label{Training}
+Ein Trainingsdatensatz für ein System zur Gestenerkennung sollte aus einer angemessenen Menge an aufgenommenen Gesten für jede Klasse (zu erkennende Geste) bestehen. Die Größe des Datensatzes, die Variabilität in den einzelnen Gesten und die Ausgeglichenheit in Bezug auf die Anzahl der Gesten pro Klasse spielt dabei eine wichtige Rolle in der Performance des Systems, welches trainiert werden soll. Ebenfalls ist die Auswahl an beobachteten Merkmalen beziehungsweise Eigenschaften sehr wichtig.~\cite{sampleSize}
+
+Bei der Auswahl der beobachteten Eigenschaften muss darauf geachtet werden, dass genug unterschiedliche Eigenschaften in die Daten aufgenommen werden, damit nachher eine Unterscheidung zwischen den Klassen möglich ist. Möchte man beispielsweise bei einem Ball feststellen, zu welcher Sportart er gehört, reicht es nicht aus nur den Umfang als Merkmal zu untersuchen. Vielmehr sollte auch das Gewicht in den Datensatz mit einbezogen werden. Ein Fußball und ein Bowlingball besitzen beispielsweise in etwa den gleichen Umfang, unterscheiden sich aber sehr stark im Gewicht. Auf der anderen Seite haben ein Fußball und ein Handball ungefähr das gleiche Gewicht, besitzen dafür aber einen unterschiedlichen Umfang. Ein System, dass mit einem Trainingsdatensatz, der nur den Umfang beinhaltet, trainiert wurde, würde also mit hoher Wahrscheinlichkeit eine schlechtere Performance aufweisen, als wenn der Datensatz auch die Gewichte beinhalten würde. Allgemein gilt, dass neue Merkmale, deren Mittelwerte für die einzelnen Klassen unterschiedlich sind immer eine geringere Fehlerwahrscheinlichkeit für den Klassifikator bewirken. Zusätzliche Informationen erhöhen zwar die Komplexität der Berechnung, können aber bei einer schlechten Performance die Erkennungsrate deutlich erhöhen. Allerdings wurde in der praktischen Anwendung oft festgestellt, dass sich ab einer bestimmten Anzahl an neu hinzugefügten Merkmalen die Performance wieder verschlechtert~\cite{patternClassification3}. Raudys und Jane beschreiben in~\cite{sampleSize} ein ''Peaking-Phänomen'', bei dem sich die Performance eines Systems bis zu einer optimalen Anzahl an Merkmalen $p_{opt}$ immer weiter verbessert und sich ab diesem Punkt wieder verschlechtert. Bei dieser Beobachtung wird davon ausgegangen, dass die Liste an potentiellen Merkmalen geordnet ist und zuerst die ''besten'' Merkmale, also die Merkmale mit der größten Auswirkung hinzugefügt werden. Die Bestimmung von $p_{opt}$ beziehungsweise die Auswahl der ''besten'' Merkmale ist dabei oft schwierig bis unmöglich. Zusammengefasst kann mal sagen, dass ein Trainingsdatensatz eine Anzahl $p_{f}$ an geeigneten Merkmalen enthalten sollte, mit denen es möglich ist zwischen den unterschiedlichen Klassen zu unterscheiden. Weist das System dann nach dem Training eine Erkennungsrate auf, die schlechter als erwartet ist, gilt mit hoher Wahrscheinlichkeit $p_{f}<p_{opt}$ und das Hinzufügen von entsprechenden neuen Merkmalen sollte in Betracht gezogen werden.
+
+Der Aufbau des in \ref{Tracking} definierten Gestenvektors ist also nicht willkürlich sondern beschreibt eine angemessene Anzahl an Merkmalen, die beobachtet werden müssen, damit eine Unterscheidung zwischen den zu erkennenden Gesten möglich ist. Für den Aufbau des Trainingsdatensatzes ist es wichtig, dass für jede zu erkennende Geste genug Gestenvektoren im Datensatz enthalten sind und die Anzahl pro Klasse ausgeglichen ist. Trainiert man beispielsweise ein System das zwei Gesten erkennen soll mit einem Datensatz, in dem nur Gesten der Klasse 1 vorkommen, wird die Erkennungsrate nicht zufriedenstellend sein, da der Klassifikator in Gesten, die eigentlich Klasse 2 zugeordnet werden müssten sehr oft Klasse 1 erkennt. Das Problem von unausgeglichenen Trainingsdatensätzen wird in~\cite{unbalancedSamples} genauer untersucht. 
+
+Damit die Klassifizierung in \eqref{finalClassification} durchgeführt werden kann, müssen die Mittelwerte $\mu_k$ und die Varianzen $\sigma^2_k$ für die einzelnen zu erkennenden Gesten $k$ anhand von Trainingsdaten $X$ berechnet werden. Die Trainingsdaten liegen als $M\times N$ Matrix vor, mit $M$ aufgenommenen Gesten, dargestellt als Gestenvektoren mit $N$ Dimensionen. Zur Verwendung in einem überwachten Lernszenario müssen die Trainingsdaten gruppiert werden, in dem jede Gesten ihrer korrespondierenden Klasse zugeordnet wird. Für jede Klasse $(k)$ und jede Dimension $(n)$ können jetzt die Werte für $\mu_{kn}$ und $\sigma^2_{kn}$ abgeschätzt werden~\cite{gillianANBC}:
+\begin{equation}
+    \mu_{kn} \; = \; \frac{1}{M_k} \sum_{i=1}^M 1{\{X_{in}}\} \qquad \qquad \quad \ \ 
+    f\ddot{u}r \ 1\leq k \leq |G|,\ 1\leq n\leq N
+\end{equation}
+\begin{equation}
+    \sigma_{kn}^2 \; = \; \frac{1}{M_k} \sum_{i=1}^M 1{\{(X_{in} - \mu_{kn})^2}\} \qquad 
+    f\ddot{u}r \ 1\leq k \leq |G|,\ 1\leq n\leq N
+\end{equation}
+dabei ist $M_k$ die Anzahl an Gesten in der $k$ten Klasse und $1\{\cdot\}$ die Indikatorfunktion:
+\begin{equation}
+    1\{\cdot\} \; = \; \begin{cases}
+                            1,&{\text{falls }}i=k,\\0,&{\text{sonst}}
+                       \end{cases}
+\end{equation}
+ 
