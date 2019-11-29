@@ -9,11 +9,12 @@
 \usepackage{mathptmx}
 %\usepackage{lmodern,textcomp}
 \usepackage[english,ngerman]{babel}
-\usepackage{microtype}
+\usepackage{microtype} %overfull box verhindern
 %
 % Mathematische Paktete
 \usepackage{amsmath,amssymb,bm,bbm}         % Formelsetzung und mathematischen Symbole
 \usepackage[amsmath,thmmarks]{ntheorem}     % Theorem-Umgebungen, alternativ: 'amsthm'
+\usepackage{siunitx}
 %
 % Grafik-Pakete einbinden
 \usepackage{graphicx,psfrag}                % Basis-Pakete zum Laden von Bildern (jpg?)
@@ -34,11 +35,12 @@
 \usepackage[format=plain,indention=.5cm]{caption} % für selbsdefinierte captions
 \usepackage{stmaryrd}                       % Blitzsymbol bei Widerspruch
 
+% Zitierblock
 \usepackage[natbib=true,style=numeric-comp,sorting=none,minnames=1,maxnames=3,doi=true,url=true, giveninits=true,eprint=false]{biblatex}  
 \bibliography{literatur/literatur.bib}% naturwissenschaftliche Zitierweise
 \usepackage[autostyle]{csquotes}
 
-
+% Für Bildunteschriften
 \usepackage{caption}
 \usepackage{subcaption}
 
@@ -101,6 +103,7 @@
 \newtheorem{beweis}{Beweis}
 %
 % ------------------------------------------------------------------- 
+% Sätze stehen nicht mehr alleine auf Beginn oder Ende von Seite
 \clubpenalty=10000
 \widowpenalty=10000
 \displaywidowpenalty=10000
